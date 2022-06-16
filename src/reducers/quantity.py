@@ -27,7 +27,7 @@ class QuantityReducer(Reducer):
 
         if user.diff_ts == 0 or user.max_moves - user.moves > 2:
             return
-        
+
         if user.moves < 5:
             return
 

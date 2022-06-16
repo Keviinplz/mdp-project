@@ -107,4 +107,3 @@ class TestQuantityReducer(unittest.TestCase):
             self.reducer.source = self.source
             self.reducer.run()
             self.assertEqual(out.getvalue(), self.expected)
-
