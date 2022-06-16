@@ -98,3 +98,13 @@ class TestQuantityReducer(unittest.TestCase):
 
             self.assertEqual(len(result.split("\t")), 1)
             self.assertEqual(out.getvalue(), expected)
+
+    def test_use_case(self):
+        """
+        After processing the test data, should print the expected output
+        """
+        with patch("sys.stdout", new=StringIO()) as out:
+            self.reducer.source = self.source
+            self.reducer.run()
+            self.assertEqual(out.getvalue(), self.expected)
+
