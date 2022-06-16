@@ -37,6 +37,7 @@ class UserMinMaxMove:
     max_ts: int
     moves: int
 
+
 @dataclass
 class UserMinMaxMoveMapped:
     """

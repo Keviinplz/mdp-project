@@ -27,5 +27,5 @@ class QuantityReducer(Reducer):
 
         if user.diff_ts == 0 or user.max_moves - user.moves > 2:
             return
-            
+
         print(f"{user.user_id}\t{user.diff_ts}\t{user.max_moves}\t{user.moves}")
