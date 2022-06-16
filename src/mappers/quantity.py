@@ -42,4 +42,4 @@ class QuantityMapper(Mapper):
     def map(self, line: str) -> None:
         user = self.parse_line(line)
         max_moves: int = self.calculate_max_moves(user.min_ts, user.max_ts)
-        print(f"{user.user_id}\t{max_moves}\t{user.moves}")
+        print(f"{user.user_id}\t{user.max_ts - user.min_ts}\t{max_moves}\t{user.moves}")

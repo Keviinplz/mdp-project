@@ -3,16 +3,15 @@ import sys
 import argparse
 from typing import Dict, Tuple
 
-from src.mappers.abstracts import Mapper
-from src.mappers.user import UserMapper
-from src.reducers.abstracts import Reducer
-from src.reducers.user import UserReducer
+from src.mappers import Mapper, UserMapper, QuantityMapper
+from src.reducers import Reducer, UserReducer, QuantityReducer
 
 
 def main():
 
     AVAILABLE_FLOWS: Dict[str, Tuple[Mapper, Reducer]] = {
-        "user": (UserMapper(), UserReducer())
+        "user": (UserMapper(), UserReducer()),
+        "quantity": (QuantityMapper(), QuantityReducer()),
     }
 
     parser = argparse.ArgumentParser()

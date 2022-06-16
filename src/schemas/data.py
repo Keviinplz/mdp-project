@@ -36,3 +36,14 @@ class UserMinMaxMove:
     min_ts: int
     max_ts: int
     moves: int
+
+@dataclass
+class UserMinMaxMoveMapped:
+    """
+    Data class when UserMinMaxMove was processed by the mapper
+    """
+
+    user_id: int
+    diff_ts: int
+    max_moves: int
+    moves: int

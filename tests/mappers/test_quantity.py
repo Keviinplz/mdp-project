@@ -9,8 +9,6 @@ from src.mappers.quantity import QuantityMapper
 class TestQuantityMapper(unittest.TestCase):
     """Test Suite for Quantity mapper"""
 
-    # ((max_ts - min_ts) // (5 * 60 * 1000)) + 1
-
     def setUp(self):
         base_ts: int = 1648827850000
         self.text = (
@@ -18,7 +16,11 @@ class TestQuantityMapper(unittest.TestCase):
             f"1\t{12356 + base_ts}#{34094 + base_ts}\t3\n"
             f"2\t{16311 + base_ts}#{16311 + base_ts}\t1\n"
         )
-        self.expected = f"0\t1\t1\n" f"1\t1\t3\n" f"2\t1\t1\n"
+        self.expected = (
+            f"0\t0\t1\t1\n"
+            f"1\t{(34094 + base_ts) - (12356 + base_ts)}\t1\t3\n"
+            f"2\t0\t1\t1\n"
+        )
         self.mapper = QuantityMapper()
         self.source = StringIO(self.text)
 
@@ -48,16 +50,16 @@ class TestQuantityMapper(unittest.TestCase):
         """
         After processing data, should print the data separated by tabs
 
-        Length of out must be 3 and have to follow this structure:
-          user\tmax_moves\tmoves
+        Length of out must be 4 and have to follow this structure:
+          user\ttimelapse\tmax_moves\tmoves
         """
         with patch("sys.stdout", new=StringIO()) as out:
             self.mapper.map("0\t0#0\t1")
 
-            expected = "0\t1\t1\n"
+            expected = "0\t0\t1\t1\n"
             result = out.getvalue()
 
-            self.assertEqual(len(result.split("\t")), 3)
+            self.assertEqual(len(result.split("\t")), 4)
             self.assertEqual(out.getvalue(), expected)
 
     def test_use_case(self):
