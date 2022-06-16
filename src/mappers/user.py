@@ -40,4 +40,3 @@ class UserMapper(Mapper):
             outLine : str = user_id + self.out_sep + out_timestamp + self.out_sep + "1"
             # output line
             print(outLine)
-            
