@@ -1,6 +1,6 @@
 #!/usr/bin/python3
-import argparse
 import sys
+import argparse
 from typing import Dict, Tuple
 
 from src.mappers.abstracts import Mapper
@@ -23,16 +23,21 @@ def main():
 
     flow = AVAILABLE_FLOWS.get(args.mapper or args.reducer)
     if not flow:
-        print("Invalid flow, please use one of the following: {}".format(", ".join(AVAILABLE_FLOWS.keys())))
+        print(
+            "Invalid flow, please use one of the following: {}".format(
+                ", ".join(AVAILABLE_FLOWS.keys())
+            )
+        )
         sys.exit(1)
-    
+
     mapper, reducer = flow
-    
+
     if args.mapper:
         mapper.run()
 
     if args.reducer:
         reducer.run()
+
 
 if __name__ == "__main__":
     main()
