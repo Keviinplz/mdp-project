@@ -1,39 +1,38 @@
 #!/usr/bin/python3
 import argparse
-from src.mappers import CountMapper, UserMapper
-from src.reducers import CountReducer, UserReducer
+import sys
+from typing import Dict, Tuple
+
+from src.mappers.abstracts import Mapper
+from src.mappers.user import UserMapper
+from src.reducers.abstracts import Reducer
+from src.reducers.user import UserReducer
 
 
 def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--mapper", action="store_true")
-    parser.add_argument("--reducer", action="store_true")
-    parser.add_argument("--placemapper", action="store_true")
-    parser.add_argument("--placereducer", action="store_true")
 
+    AVAILABLE_FLOWS: Dict[str, Tuple[Mapper, Reducer]] = {
+        "user": (UserMapper(), UserReducer())
+    }
+
+    parser = argparse.ArgumentParser()
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument("--mapper", type=str)
+    group.add_argument("--reducer", type=str)
     args = parser.parse_args()
 
-    if not (bool(args.mapper) ^ bool(args.reducer)):
-        if not (bool(args.placemapper) ^ bool(args.placereducer)):
-            print("Please specify either --mapper or --reducer")
-            return
-
+    flow = AVAILABLE_FLOWS.get(args.mapper or args.reducer)
+    if not flow:
+        print("Invalid flow, please use one of the following: {}".format(", ".join(AVAILABLE_FLOWS.keys())))
+        sys.exit(1)
+    
+    mapper, reducer = flow
+    
     if args.mapper:
-        mapper = CountMapper()
         mapper.run()
 
     if args.reducer:
-        reducer = CountReducer()
         reducer.run()
-        
-    if args.placemapper:
-        mapper = UserMapper()
-        mapper.run()
-
-    if args.placereducer:
-        reducer = UserReducer()
-        reducer.run()
-
 
 if __name__ == "__main__":
     main()
