@@ -94,7 +94,7 @@ class QuantityReducer(Reducer):
         if user.diff_ts == 0 or user.max_moves - user.moves > 2:
             return
 
-        if user.moves < 5:
+        if user.moves < 10:
             return
 
         out_ts : str = str(user.diff_ts).zfill(10)
