@@ -6,49 +6,12 @@ from dataclasses import dataclass
 
 
 @dataclass
-class UserMove:
-    """
-    Data class for a user move in r/place canvas
-    """
-
-    timestamp: int
-    user_id: int
-    x: int
-    y: int
-    color: int
-    is_mod: bool
-
-
-@dataclass
-class UserMoveMapped:
-    """
-    Data class when UserMove was processed by the mapper
-    """
-
-    user_id: int
-    timestamp: int
-    count: int
-
-
-@dataclass
-class UserMinMaxMove:
-    """
-    Data class for a user with min ts and max ts, and number of move that the user made
-    """
-
-    user_id: int
-    min_ts: int
-    max_ts: int
-    moves: int
-
-
-@dataclass
 class UserMinMaxMoveMapped:
     """
     Data class when UserMinMaxMove was processed by the mapper
     """
 
-    user_id: int
+    user_id: str
     diff_ts: int
     max_moves: int
     moves: int
@@ -119,7 +82,7 @@ class QuantityReducer(Reducer):
         user_id, diff_ts, max_moves, moves = data
 
         return UserMinMaxMoveMapped(
-            user_id=int(user_id),
+            user_id=user_id,
             diff_ts=int(diff_ts),
             max_moves=int(max_moves),
             moves=int(moves),
@@ -134,7 +97,8 @@ class QuantityReducer(Reducer):
         if user.moves < 5:
             return
 
-        print(f"{user.user_id}\t{user.diff_ts}\t{user.max_moves}\t{user.moves}")
+        out_ts : str = str(user.diff_ts).zfill(10)
+        print(f"{user.user_id}\t{out_ts}\t{user.max_moves}\t{user.moves}")
 
 
 def main():

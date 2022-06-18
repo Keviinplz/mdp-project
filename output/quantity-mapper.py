@@ -5,53 +5,15 @@ from typing import List, Union, TextIO
 from datetime import datetime
 from dataclasses import dataclass
 
-
-@dataclass
-class UserMove:
-    """
-    Data class for a user move in r/place canvas
-    """
-
-    timestamp: int
-    user_id: int
-    x: int
-    y: int
-    color: int
-    is_mod: bool
-
-
-@dataclass
-class UserMoveMapped:
-    """
-    Data class when UserMove was processed by the mapper
-    """
-
-    user_id: int
-    timestamp: int
-    count: int
-
-
 @dataclass
 class UserMinMaxMove:
     """
     Data class for a user with min ts and max ts, and number of move that the user made
     """
 
-    user_id: int
+    user_id: str
     min_ts: int
     max_ts: int
-    moves: int
-
-
-@dataclass
-class UserMinMaxMoveMapped:
-    """
-    Data class when UserMinMaxMove was processed by the mapper
-    """
-
-    user_id: int
-    diff_ts: int
-    max_moves: int
     moves: int
 
 
@@ -104,24 +66,6 @@ class Mapper(ABC):
         ...
 
 
-def str2timestamp(date: str, *, format: List[str]) -> int:
-    """
-    Converts a datetime string to a timestamp.
-    Must to be a datetime string in the format specified in the format argument. (or list of it)
-    """
-    result: Union[int, None] = None
-    for f in format:
-        try:
-            result = int(datetime.strptime(date, f).timestamp())
-        except ValueError:
-            pass
-
-    if result is None:
-        raise ValueError(f"Could not convert {date} to timestamp")
-
-    return result
-
-
 class QuantityMapper(Mapper):
     @staticmethod
     def calculate_max_moves(min_ts: int, max_ts: int) -> int:
@@ -152,7 +96,7 @@ class QuantityMapper(Mapper):
             raise LineFormatError("Timestamp should be an integer", line)
 
         return UserMinMaxMove(
-            user_id=int(user_id),
+            user_id=user_id,
             min_ts=int(min_ts),
             max_ts=int(max_ts),
             moves=int(moves),
@@ -161,7 +105,9 @@ class QuantityMapper(Mapper):
     def map(self, line: str) -> None:
         user = self.parse_line(line)
         max_moves: int = self.calculate_max_moves(user.min_ts, user.max_ts)
-        print(f"{user.user_id}\t{user.max_ts - user.min_ts}\t{max_moves}\t{user.moves}")
+        # formatting to 10 characters for timestamp
+        ts_diff : str = str(user.max_ts - user.min_ts).zfill(10)
+        print(f"{user.user_id}\t{ts_diff}\t{max_moves}\t{user.moves}")
 
 
 def main():

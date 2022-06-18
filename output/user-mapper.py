@@ -13,46 +13,11 @@ class UserMove:
     """
 
     timestamp: int
-    user_id: int
+    user_id: str
     x: int
     y: int
     color: int
     is_mod: bool
-
-
-@dataclass
-class UserMoveMapped:
-    """
-    Data class when UserMove was processed by the mapper
-    """
-
-    user_id: int
-    timestamp: int
-    count: int
-
-
-@dataclass
-class UserMinMaxMove:
-    """
-    Data class for a user with min ts and max ts, and number of move that the user made
-    """
-
-    user_id: int
-    min_ts: int
-    max_ts: int
-    moves: int
-
-
-@dataclass
-class UserMinMaxMoveMapped:
-    """
-    Data class when UserMinMaxMove was processed by the mapper
-    """
-
-    user_id: int
-    diff_ts: int
-    max_moves: int
-    moves: int
 
 
 class DataError(Exception):
@@ -125,7 +90,6 @@ def str2timestamp(date: str, *, format: List[str]) -> int:
 class UserMapper(Mapper):
     in_sep: str = ","
     out_sep: str = "\t"
-    ts_sep: str = "#"
     first_time: str = "2022-04-01 12:44:10.315"
     DATETIME_FORMAT_STRING: List[str] = ["%Y-%m-%d %H:%M:%S.%f", "%Y-%m-%d %H:%M:%S"]
 
@@ -152,7 +116,7 @@ class UserMapper(Mapper):
 
         return UserMove(
             timestamp=int(data[0]) + self.first_ts,
-            user_id=int(data[1]),
+            user_id=data[1],
             x=int(data[2]),
             y=int(data[3]),
             color=int(data[4]),
@@ -164,8 +128,10 @@ class UserMapper(Mapper):
 
         if not move or move.is_mod:
             return
-
-        print(f"{move.user_id}\t{move.timestamp}\t1")
+        
+        # formatting to 10 characters for timestamp
+        out_ts : str = str(move.timestamp).zfill(10)
+        print(f"{move.user_id}\t{out_ts}\t1")
 
 
 def main():
