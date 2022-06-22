@@ -6,15 +6,15 @@ from dataclasses import dataclass
 
 
 @dataclass
-class UserMinMaxMoveMapped:
+class MoveUserDiffMaxMapped:
     """
-    Data class when UserMinMaxMove was processed by the mapper
+    Data class when MoveUserDiffMax was processed by the mapper
     """
 
+    moves: int
     user_id: str
     diff_ts: int
     max_moves: int
-    moves: int
 
 
 class DataError(Exception):
@@ -70,33 +70,35 @@ class Reducer(ABC):
 
 
 class QuantityReducer(Reducer):
-    def parse_line(self, line: str) -> UserMinMaxMoveMapped:
+    def parse_line(self, line: str) -> MoveUserDiffMaxMapped:
         data = line.split("\t")
 
         if len(data) != 4:
             raise LineFormatError("Line should have 4 fields", line)
+        
+        moves, user_id, diff_ts, max_moves = data
+        
+        if not moves.isdigit():
+            raise LineFormatError("Moves should be an integer", line)
 
-        if not all(map(lambda x: x.isdigit(), data)):
-            raise LineFormatError("Line should have only digits", line)
+        if not user_id.isdigit():
+            raise LineFormatError("User id should be an integer", line)
+        
+        if not diff_ts.isdigit():
+            raise LineFormatError("Timestamp should be an integer", line)
+        
+        if not max_moves.isdigit():
+            raise LineFormatError("Moves should be an integer", line)
 
-        user_id, diff_ts, max_moves, moves = data
-
-        return UserMinMaxMoveMapped(
+        return MoveUserDiffMaxMapped(
+            moves=int(moves),
             user_id=user_id,
             diff_ts=int(diff_ts),
             max_moves=int(max_moves),
-            moves=int(moves),
         )
 
     def reduce(self, line: str) -> None:
         user = self.parse_line(line)
-
-        if user.diff_ts == 0 or user.max_moves - user.moves > 2:
-            return
-
-        if user.moves < 10:
-            return
-
         out_ts : str = str(user.diff_ts).zfill(10)
         print(f"{user.user_id}\t{out_ts}\t{user.max_moves}\t{user.moves}")
 

@@ -6,14 +6,14 @@ from datetime import datetime
 from dataclasses import dataclass
 
 @dataclass
-class UserMinMaxMove:
+class UserMinMaxMoveReduced:
     """
-    Data class for a user with min ts and max ts, and number of move that the user made
+    Data class when UserMinMaxMove was processed by the reducer
     """
 
     user_id: str
-    min_ts: int
-    max_ts: int
+    diff_ts: int
+    max_moves: int
     moves: int
 
 
@@ -66,52 +66,43 @@ class Mapper(ABC):
         ...
 
 
-class QuantityMapper(Mapper):
-    @staticmethod
-    def calculate_max_moves(min_ts: int, max_ts: int) -> int:
-        return ((max_ts - min_ts) // (5 * 60 * 1000)) + 1
-
-    def parse_line(self, line: str) -> UserMinMaxMove:
+class MovesSorterMapper(Mapper):
+    def parse_line(self, line: str) -> UserMinMaxMoveReduced:
         data = line.split("\t")
 
-        if len(data) != 3:
-            raise LineFormatError("Line should have 3 fields", line)
+        if len(data) != 4:
+            raise LineFormatError("Line should have 4 fields", line)
 
-        user_id, ts, moves = data
+        user_id, diff_ts, max_moves, moves = data
 
         if not user_id.isdigit():
             raise LineFormatError("User id should be an integer", line)
+        
+        if not diff_ts.isdigit():
+            raise LineFormatError("Timestamp should be an integer", line)
+        
+        if not max_moves.isdigit():
+            raise LineFormatError("Moves should be an integer", line)
 
         if not moves.isdigit():
             raise LineFormatError("Moves should be an integer", line)
 
-        ts_info = ts.split("#")
-
-        if len(ts_info) != 2:
-            raise LineFormatError("Timestamp should be separated by '#'", line)
-
-        min_ts, max_ts = ts_info
-
-        if not min_ts.isdigit() or not max_ts.isdigit():
-            raise LineFormatError("Timestamp should be an integer", line)
-
-        return UserMinMaxMove(
+        return UserMinMaxMoveReduced(
             user_id=user_id,
-            min_ts=int(min_ts),
-            max_ts=int(max_ts),
+            diff_ts=int(diff_ts),
+            max_moves=int(max_moves),
             moves=int(moves),
         )
 
     def map(self, line: str) -> None:
         user = self.parse_line(line)
-        max_moves: int = self.calculate_max_moves(user.min_ts, user.max_ts)
         # formatting to 10 characters for timestamp
-        ts_diff : str = str(user.max_ts - user.min_ts).zfill(10)
-        print(f"{user.user_id}\t{ts_diff}\t{max_moves}\t{user.moves}")
+        ts_diff : str = str(user.diff_ts).zfill(10)
+        print(f"{user.moves}\t{user.user_id}\t{ts_diff}\t{user.max_moves}")
 
 
 def main():
-    mapper = QuantityMapper()
+    mapper = MovesSorterMapper()
     mapper.run()
 
 
