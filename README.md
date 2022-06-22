@@ -33,7 +33,24 @@ Example row (the first recorded placement on the position 0,0.):
 
 Inside the dataset there are instances of moderators using a rectangle drawing tool to handle inappropriate content. These rows differ in the coordinate tuple which contain four values instead of two–“x1,y1,x2,y2” corresponding to the upper left x1, y1 coordinate and the lower right x2, y2 coordinate of the moderation rect. These events apply the specified color to all tiles within those two points, inclusive.
 
-The link of the entire dataset is available [here](https://placedata.reddit.com/data/canvas-history/2022_place_canvas_history.csv.gzip).
+The link of the entire dataset is available [here](https://placedata.reddit.com/data/canvas-history/2022_place_canvas_history.csv.gzip). 
+
+However, we actually used a simplified dataset with timestamp and users as integers (so size drops to `5.2 gb`)
+
+Where:
+* time: milliseconds since first placement. First placement was 2022-04-01 12:44:10.315
+
+* user_id: id of users, starts at 0. The original file had hashed strings, but since we don't know the hashing algorithm, it can be replaced with simple id counting (256 bits to 64 bits).
+
+* x: the x coordinate of the pixel in the canvas
+
+* y: the y coordinate of the pixel in the canvas
+
+* color: value between 0 - 31. see color index table below for corresponding real color.
+
+* mod: 1 if it's a part of one of the placed rectangles by moderators, 0 if not. (we filter all files with mod equals to 1)
+
+Link is available [here](https://drive.google.com/file/d/1WYuZaoQxBszO_3mNrD4rQlCS5aiKPFvk/view?usp=sharing)
 
 # How to development
 
@@ -52,7 +69,10 @@ The repository has the following folder structure:
 ├── src              <--- source code for map-reduce framework
 │   ├── mappers
 │   └── reducers
-├── tests            <--- code testing
+├── tests            <--- code testing (yes, we tested all because we are excelents software engineers :D).
+├── output           <--- Files ready-to-use for hadoop streams.
 ├── main.py          <--- main file for map-reduce framework, with --mapper and --reducer flags to specify which mapper and reducer to use
 └── main.ipynb       <--- jupyter notebook to interact with data.
 ```
+
+Enjoy!
